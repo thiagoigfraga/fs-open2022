@@ -1,0 +1,1 @@
+This time the user will have the feeling that loading is being done faster, and indeed it is, because requests are reduced and only dynamic content will be reloaded. This feeling of greater fluidity causes the form submission request to render the content without the user reloading the page, and seeing that the page content has added its annotation.

@@ -1,0 +1,7 @@
+1 - The user does the sending as he would do in another traditional web application
+
+2- The web server itself has a way of handling the request that doesn't need to go through the server at the moment, so it renders the annotation before sending it to the back-end.
+
+3 - Now the annotation is rendered slightly faster, only one request is made, that of sending the annotation to the server
+
+4 - Other static resources are not reloaded, as there is no need. The feeling is one of fluidity.
