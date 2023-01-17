@@ -9,6 +9,11 @@ function App() {
     setSearch(event.target.value);
   };
 
+  const handleShowClick = (countryName) => {
+    setSearch(countryName);
+  }
+
+
   useEffect(() => {
     if (search.length > 0) {
       const countriesSearch = axios.get(
@@ -25,7 +30,6 @@ function App() {
 
   return (
     <div>
-      <h1>search: {search}</h1>
       <label>
         find countries
         <input value={search} onChange={handleSearch} />
@@ -57,7 +61,17 @@ function App() {
         )}
 
         {countriesList.length < 10 && countriesList.length > 1
-          ? countriesList.map((c) => <p key={c.name.common}>{c.name.common}</p>)
+          ? countriesList.map((c) => {
+            return(
+              <div key={c.name.common}>
+              <span>
+                {c.name.common}
+            <button onClick={() => handleShowClick(c.name.common)}>show</button>
+              </span>
+              <br/>
+              </div>
+            )
+          })
           : ""}
 
         {countriesList.length > 10 ? (
@@ -65,6 +79,8 @@ function App() {
         ) : (
           ""
         )}
+
+        {countriesList.length === 0 ?? ''}
       </div>
     </div>
   );
