@@ -1,8 +1,13 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import {
+  create,
+  deletePerson,
+  getPersons,
+  update,
+} from "./services/personServices";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,32 +16,45 @@ const App = () => {
   const [search, setSearch] = useState("");
   const [modified, setModified] = useState(false);
 
-
   useEffect(() => {
-    const promise = axios.get('http://localhost:3001/persons');
-
-    promise.then((response) => setPersons(response.data));
-  }, [])
-
-
-
-
+    getPersons().then((returnedPersons) => setPersons(returnedPersons));
+  }, [persons]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const userAlreadyExists =
-      persons.filter((p) => p.name === newName).length > 0;
+    const userAlreadyExists = persons.find((p) => p.name === newName);
 
     if (!userAlreadyExists) {
-      const newNameObject = { name: newName, number: newNumber };
-      setPersons(persons.concat(newNameObject));
+      create(newName, newNumber).then((returnedPerson) =>
+        setPersons(persons.concat(returnedPerson))
+      );
       setNewName("");
       setNewNumber("");
       return;
+    } else if (
+      userAlreadyExists &&
+      userAlreadyExists.number !== newNumber &&
+      newNumber.length > 0
+    ) {
+      if (
+        window.confirm(
+          `${userAlreadyExists.name} is already added to phonebook, replace the older number with a new one?`
+        )
+      ) {
+        const updatedObject = {
+          name: userAlreadyExists.name,
+          number: newNumber,
+        };
+
+        update(userAlreadyExists.id, updatedObject).then((updatedPerson) =>
+          persons.map((p) => (p.id === updatedPerson.id ? updatedPerson : p))
+        );
+      }
+    } else {
+      window.alert(`${newName} is already added to phonebook`);
     }
 
-    window.alert(`${newName} is already added to phonebook`);
     setNewName("");
     setNewNumber("");
   };
@@ -51,6 +69,20 @@ const App = () => {
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
     setModified(true);
+  };
+
+  const handleDeletePerson = (name) => {
+    const person = persons.find((p) => p.name === name);
+
+    if (person) {
+      if (window.confirm(`Delete ${name} ?`)) {
+        const { id: personId } = person;
+
+        deletePerson(personId).then((returnedDelPerson) => {
+          persons.filter((p) => p.id === returnedDelPerson.id);
+        });
+      }
+    }
   };
 
   const usersToShow = modified
@@ -73,7 +105,12 @@ const App = () => {
       <h2>Numbers</h2>
       {persons
         ? usersToShow.map((p) => (
-            <Persons key={p.name} name={p.name} number={p.number} />
+            <Persons
+              key={p.name}
+              name={p.name}
+              number={p.number}
+              handleDeletePerson={handleDeletePerson}
+            />
           ))
         : "..."}
     </div>
