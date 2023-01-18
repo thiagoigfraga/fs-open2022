@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 function App() {
   const [search, setSearch] = useState("");
   const [countriesList, setCountriesList] = useState([]);
+  const [capitalWeather, setCapitalWeather] = useState({});
+  const [weatherImg, setWeatherImg] = useState([]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -11,8 +13,7 @@ function App() {
 
   const handleShowClick = (countryName) => {
     setSearch(countryName);
-  }
-
+  };
 
   useEffect(() => {
     if (search.length > 0) {
@@ -27,6 +28,32 @@ function App() {
       });
     }
   }, [search, countriesList]);
+
+  useEffect(() => {
+
+
+    if (countriesList.length === 1) {
+      const weather = axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${countriesList[0].capital}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
+      );
+
+      weather.then((response) => {
+        if (response.data.name !== capitalWeather.name) {
+
+          if(response.data.weather[0]){
+
+            setWeatherImg({
+              icon: response.data.weather[0].icon,
+              description: response.data.weather[0].description
+            })
+
+          }
+
+          setCapitalWeather(response.data);
+        }
+      });
+    }
+  }, [countriesList, capitalWeather]);
 
   return (
     <div>
@@ -55,6 +82,26 @@ function App() {
               src={countriesList[0].flags.png}
               alt={`${countriesList[0].name.common} flag`}
             />
+
+            <h1>Weather in {countriesList[0].capital}</h1>
+
+            <p>temperature {capitalWeather?.main?.temp} Celsius</p>
+
+    {  weatherImg ? 
+    
+        <img
+              src={`http://openweathermap.org/img/w/${weatherImg.icon}.png`}
+              alt={`${weatherImg.description}`}
+            />
+
+            :
+
+            <p>No image yet</p>
+
+
+            }
+
+            <p>wind {capitalWeather?.wind?.speed} m/s</p>
           </>
         ) : (
           ""
@@ -62,16 +109,18 @@ function App() {
 
         {countriesList.length < 10 && countriesList.length > 1
           ? countriesList.map((c) => {
-            return(
-              <div key={c.name.common}>
-              <span>
-                {c.name.common}
-            <button onClick={() => handleShowClick(c.name.common)}>show</button>
-              </span>
-              <br/>
-              </div>
-            )
-          })
+              return (
+                <div key={c.name.common}>
+                  <span>
+                    {c.name.common}
+                    <button onClick={() => handleShowClick(c.name.common)}>
+                      show
+                    </button>
+                  </span>
+                  <br />
+                </div>
+              );
+            })
           : ""}
 
         {countriesList.length > 10 ? (
@@ -80,7 +129,7 @@ function App() {
           ""
         )}
 
-        {countriesList.length === 0 ?? ''}
+        {countriesList.length === 0 ?? ""}
       </div>
     </div>
   );
