@@ -8,6 +8,8 @@ import {
   getPersons,
   update,
 } from "./services/personServices";
+import "./css/App.css";
+import { Notification } from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -15,10 +17,20 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [modified, setModified] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [type, setType] = useState(null);
 
   useEffect(() => {
     getPersons().then((returnedPersons) => setPersons(returnedPersons));
-  }, [persons]);
+
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMessage(null);
+      setType(null);
+    }, 5000);
+  }, [message, type]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -31,6 +43,10 @@ const App = () => {
       );
       setNewName("");
       setNewNumber("");
+
+      setMessage(`${newName} added`);
+      setType("sucess");
+
       return;
     } else if (
       userAlreadyExists &&
@@ -47,12 +63,20 @@ const App = () => {
           number: newNumber,
         };
 
-        update(userAlreadyExists.id, updatedObject).then((updatedPerson) =>
-          persons.map((p) => (p.id === updatedPerson.id ? updatedPerson : p))
-        );
+        update(userAlreadyExists.id, updatedObject)
+          .then((updatedPerson) =>
+            persons.map((p) => (p.id === updatedPerson.id ? updatedPerson : p))
+          )
+          .catch((error) => {
+            setMessage(
+              `Information of ${userAlreadyExists.name} has already been removed from server`
+            );
+            setType("error");
+          });
       }
     } else {
-      window.alert(`${newName} is already added to phonebook`);
+      setMessage(`${newName} is already added to phonebook`);
+      setType("error");
     }
 
     setNewName("");
@@ -94,6 +118,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} type={type} />
       <Filter value={search} onChangeFilter={handleSearchChange} />
       <PersonForm
         handleSubmit={handleSubmit}
