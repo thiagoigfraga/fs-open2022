@@ -5,6 +5,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static("build"));
 
 let persons = [
   {
@@ -105,7 +106,7 @@ app.post("/api/persons", (req, res) => {
   res.json(person);
 });
 
-const PORT = 8080; //3001
+const PORT = 3001; //8080
 
 app.listen(PORT, () => {
   console.log(`Servidor funcionando no PORT:${PORT}`);
