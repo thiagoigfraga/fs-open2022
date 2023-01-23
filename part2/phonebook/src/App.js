@@ -23,7 +23,7 @@ const App = () => {
   useEffect(() => {
     getPersons().then((returnedPersons) => setPersons(returnedPersons));
 
-  }, []);
+  }, [persons]);
 
   useEffect(() => {
     setTimeout(() => {
