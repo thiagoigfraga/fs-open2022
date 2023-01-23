@@ -78,7 +78,7 @@ app.post("/api/notes", (request, response) => {
   response.json(note);
 });
 
-const PORT = 8080
+const PORT = 3001 //8080
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
