@@ -22,7 +22,6 @@ const App = () => {
 
   useEffect(() => {
     getPersons().then((returnedPersons) => setPersons(returnedPersons));
-
   }, [persons]);
 
   useEffect(() => {
@@ -38,14 +37,20 @@ const App = () => {
     const userAlreadyExists = persons.find((p) => p.name === newName);
 
     if (!userAlreadyExists) {
-      create(newName, newNumber).then((returnedPerson) =>
-        setPersons(persons.concat(returnedPerson))
-      );
-      setNewName("");
-      setNewNumber("");
+      create(newName, newNumber)
+        .then((returnedPerson) => setPersons(persons.concat(returnedPerson)))
+        .catch((error) => {
+          setMessage(error.response.data.error);
+          setType('error');
+        });
 
-      setMessage(`${newName} added`);
-      setType("sucess");
+        if(type !== "error"){
+
+          setNewName("");
+          setNewNumber("");
+          setMessage(`${newName} added`);
+          setType("sucess");
+        }
 
       return;
     } else if (

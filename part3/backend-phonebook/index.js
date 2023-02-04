@@ -13,6 +13,18 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
@@ -68,7 +80,7 @@ app.post("/api/persons", (req, res, next) => {
 
   person.save().then((savedPerson) => {
     res.json(savedPerson);
-  });
+  }).catch(error => next(error));
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
@@ -85,8 +97,9 @@ app.put("/api/persons/:id", (req, res, next) => {
 });
 
 app.use(unknownEndpoint);
+app.use(errorHandler);
 
-const PORT = 3001; //8080
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Servidor funcionando no PORT:${PORT}`);

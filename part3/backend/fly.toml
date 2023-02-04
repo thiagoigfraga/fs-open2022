@@ -1,12 +1,12 @@
-# fly.toml file generated for notebook-fs2023 on 2023-01-21T11:46:26-03:00
+# fly.toml file generated for morning-rain-5429 on 2023-02-03T19:39:22-03:00
 
-app = "notebook-fs2023"
+app = "morning-rain-5429"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
 [env]
-PORT = 8080
+  PORT = "8080"
 
 [experimental]
   auto_rollback = true
