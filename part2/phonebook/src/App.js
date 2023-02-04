@@ -21,8 +21,13 @@ const App = () => {
   const [type, setType] = useState(null);
 
   useEffect(() => {
-    getPersons().then((returnedPersons) => setPersons(returnedPersons));
-  }, [persons]);
+    getPersons()
+      .then((returnedPersons) => setPersons(returnedPersons))
+      .catch((error) => {
+        setMessage(error.response.data.error);
+        setType("error");
+      });
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -41,16 +46,15 @@ const App = () => {
         .then((returnedPerson) => setPersons(persons.concat(returnedPerson)))
         .catch((error) => {
           setMessage(error.response.data.error);
-          setType('error');
+          setType("error");
         });
 
-        if(type !== "error"){
-
-          setNewName("");
-          setNewNumber("");
-          setMessage(`${newName} added`);
-          setType("sucess");
-        }
+      if (type !== "error") {
+        setNewName("");
+        setNewNumber("");
+        setMessage(`${newName} added`);
+        setType("sucess");
+      }
 
       return;
     } else if (
@@ -107,9 +111,14 @@ const App = () => {
       if (window.confirm(`Delete ${name} ?`)) {
         const { id: personId } = person;
 
-        deletePerson(personId).then((returnedDelPerson) => {
-          persons.filter((p) => p.id === returnedDelPerson.id);
-        });
+        deletePerson(personId)
+          .then((returnedDelPerson) => {
+            setPersons(persons.filter((p) => p.id !== returnedDelPerson.id));
+          })
+          .catch((error) => {
+            setMessage(error.response.data.error);
+            setType("error");
+          });
       }
     }
   };
