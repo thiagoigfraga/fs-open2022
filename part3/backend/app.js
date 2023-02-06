@@ -1,4 +1,4 @@
-const config = require('../utils/config')
+const config = require('./utils/config')
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
