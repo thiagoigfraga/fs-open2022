@@ -77,9 +77,17 @@ app.post("/api/persons", (req, res, next) => {
     number: body.number || false,
   });
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson);
-  }).catch(error => next(error));
+  Person.findOne({name: body.name}).then(user => {
+      if(user){
+        res.status(400).json({
+          error: "Name already exists",
+        })
+      }else{
+        person.save().then((savedPerson) => {
+          res.json(savedPerson);
+        }).catch(error => next(error));
+      }
+  })
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
